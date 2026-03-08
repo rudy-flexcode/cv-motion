@@ -243,6 +243,24 @@
   });
 </script>
 
+<svelte:head>
+  <title>CV Motion | Generateur de CV moderne</title>
+  <meta
+    name="description"
+    content="Creez un CV professionnel en minutes, export PDF HD, design moderne et paiement securise."
+  />
+  <meta property="og:title" content="CV Motion | Generateur de CV moderne" />
+  <meta
+    property="og:description"
+    content="Creez un CV professionnel en minutes, export PDF HD, design moderne et paiement securise."
+  />
+  <meta name="twitter:title" content="CV Motion | Generateur de CV moderne" />
+  <meta
+    name="twitter:description"
+    content="Creez un CV professionnel en minutes, export PDF HD, design moderne et paiement securise."
+  />
+</svelte:head>
+
 <main class="page">
   <section class="hero">
     <div class="hero-orb hero-orb--one"></div>

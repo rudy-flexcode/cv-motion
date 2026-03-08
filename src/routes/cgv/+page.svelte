@@ -1,5 +1,6 @@
 <svelte:head>
-  <title>Conditions generales de vente</title>
+  <title>Conditions generales de vente | CV Motion</title>
+  <meta name="description" content="Conditions generales de vente du service CV Motion." />
 </svelte:head>
 
 <main class="legal-page">

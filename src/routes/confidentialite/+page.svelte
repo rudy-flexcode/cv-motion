@@ -1,5 +1,9 @@
 <svelte:head>
-  <title>Politique de confidentialite</title>
+  <title>Politique de confidentialite | CV Motion</title>
+  <meta
+    name="description"
+    content="Politique de confidentialite et traitement des donnees personnelles de CV Motion."
+  />
 </svelte:head>
 
 <main class="legal-page">

@@ -1,6 +1,9 @@
 <script lang="ts">
-	import favicon from '$lib/assets/favicon.svg';
+	import { page } from '$app/stores';
+	import logoKreolTech from '$lib/assets/logo-kreol-tech.png';
 
+	const siteName = 'CV Motion';
+	const ogImagePath = '/og-cv-motion.svg';
 	let { children } = $props();
 </script>
 
@@ -11,7 +14,17 @@
 		href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap"
 		rel="stylesheet"
 	/>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href={logoKreolTech} type="image/png" />
+	<link rel="apple-touch-icon" href={logoKreolTech} />
+	<link rel="canonical" href={$page.url.origin + $page.url.pathname} />
+	<meta property="og:site_name" content={siteName} />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content={$page.url.origin + $page.url.pathname} />
+	<meta property="og:image" content={$page.url.origin + ogImagePath} />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:image" content={$page.url.origin + ogImagePath} />
 </svelte:head>
 
 {@render children()}

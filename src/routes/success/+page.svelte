@@ -99,7 +99,12 @@
 </script>
 
 <svelte:head>
-  <title>Paiement reussi</title>
+  <title>Paiement reussi | CV Motion</title>
+  <meta
+    name="description"
+    content="Votre paiement est confirme. Le telechargement du CV peut demarrer."
+  />
+  <meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
 <div class="page">

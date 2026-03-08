@@ -1,5 +1,7 @@
 <svelte:head>
-  <title>Paiement annule</title>
+  <title>Paiement annule | CV Motion</title>
+  <meta name="description" content="Votre paiement a ete annule. Vous pouvez reessayer quand vous voulez." />
+  <meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
 <div class="page">

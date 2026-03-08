@@ -1,5 +1,7 @@
 <svelte:head>
-  <title>Maintenance en cours</title>
+  <title>Maintenance | CV Motion</title>
+  <meta name="description" content="Le service CV Motion est temporairement en maintenance." />
+  <meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
 <main class="page">

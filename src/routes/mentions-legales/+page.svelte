@@ -1,5 +1,6 @@
 <svelte:head>
-  <title>Mentions legales</title>
+  <title>Mentions legales | CV Motion</title>
+  <meta name="description" content="Informations legales et editeur du site CV Motion." />
 </svelte:head>
 
 <main class="legal-page">
