@@ -201,7 +201,7 @@
       if (!res.ok) {
         const text = await res.text();
         if (res.status === 403) {
-          alert('Paiement requis. Utilisez PDF securise.');
+          alert('Paiement requis. Utilisez Telecharger.');
         } else {
           alert(text || 'Erreur lors du telechargement.');
         }
@@ -718,9 +718,9 @@
                   cvToPay = cv;
                   showPaymentModal = true;
                 }}
-                title="PDF securise"
+                title="Telecharger le PDF"
               >
-                PDF securise
+                Telecharger
               </button>
               <button
                 class="refresh"
