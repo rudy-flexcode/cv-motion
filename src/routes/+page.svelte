@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { supabase } from '$lib/assets/supabase';
   import { COMPETENCES, COMPETENCES_GROUPED } from '$lib/competences';
   import CVPreviewModal from '$lib/assets/CVPreviewModal.svelte';
@@ -10,7 +10,16 @@
 
   let email = '';
   let password = '';
+  let confirmPassword = '';
   let isLogin = true;
+  let authError = '';
+  let authNotice = '';
+  let isSubmitting = false;
+  let showPassword = false;
+  let showConfirmPassword = false;
+  let pendingEmail = '';
+  let resendCooldown = 0;
+  let resendInterval: ReturnType<typeof setInterval> | null = null;
   let user: any = null;
 
   let cvs: any[] = [];
@@ -85,20 +94,108 @@
     cvForm.formations = cvForm.formations.filter((_, i) => i !== index);
   }
 
-  async function signup() {
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) return alert(error.message);
-    alert('Compte cree. Verifiez votre email pour confirmer.');
-    email = '';
+  function setAuthMode(nextIsLogin: boolean) {
+    isLogin = nextIsLogin;
+    authError = '';
+    authNotice = '';
     password = '';
+    confirmPassword = '';
+  }
+
+  function startResendCooldown(seconds = 30) {
+    resendCooldown = seconds;
+    if (resendInterval) clearInterval(resendInterval);
+    resendInterval = setInterval(() => {
+      resendCooldown -= 1;
+      if (resendCooldown <= 0 && resendInterval) {
+        clearInterval(resendInterval);
+        resendInterval = null;
+      }
+    }, 1000);
+  }
+
+  async function signup() {
+    authError = '';
+    authNotice = '';
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      authError = 'Veuillez renseigner un email valide.';
+      return;
+    }
+
+    if (password.length < 6) {
+      authError = 'Le mot de passe doit contenir au moins 6 caracteres.';
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      authError = 'Les mots de passe ne correspondent pas.';
+      return;
+    }
+
+    isSubmitting = true;
+    const { error } = await supabase.auth.signUp({
+      email: trimmedEmail,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin
+      }
+    });
+    isSubmitting = false;
+    if (error) {
+      authError = error.message;
+      return;
+    }
+
+    pendingEmail = trimmedEmail;
+    authNotice = `Compte cree. Un email de confirmation vient d'etre envoye a ${trimmedEmail}.`;
+    startResendCooldown();
+    password = '';
+    confirmPassword = '';
     isLogin = true;
   }
 
   async function login() {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return alert(error.message);
+    authError = '';
+    authNotice = '';
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      authError = 'Veuillez renseigner votre email.';
+      return;
+    }
+
+    isSubmitting = true;
+    const { data, error } = await supabase.auth.signInWithPassword({ email: trimmedEmail, password });
+    isSubmitting = false;
+    if (error) {
+      authError = error.message;
+      return;
+    }
     user = data.user;
+    pendingEmail = '';
     await getMesCVs();
+  }
+
+  async function resendConfirmation() {
+    const resendEmail = (pendingEmail || email).trim();
+    if (!resendEmail) {
+      authError = 'Veuillez saisir votre email pour renvoyer le message.';
+      return;
+    }
+    authError = '';
+    authNotice = '';
+    isSubmitting = true;
+    const { error } = await supabase.auth.resend({ type: 'signup', email: resendEmail });
+    isSubmitting = false;
+    if (error) {
+      authError = error.message;
+      return;
+    }
+    pendingEmail = resendEmail;
+    authNotice = `Email de confirmation renvoye a ${resendEmail}.`;
+    startResendCooldown();
   }
 
   async function logout() {
@@ -241,6 +338,10 @@
       await getMesCVs();
     }
   });
+
+  onDestroy(() => {
+    if (resendInterval) clearInterval(resendInterval);
+  });
 </script>
 
 <svelte:head>
@@ -344,19 +445,103 @@
 
   {#if !user}
     <section class="auth-container" id="auth">
-      <h2>{isLogin ? 'Se connecter' : 'Creer un compte'}</h2>
+      <div class="auth-header">
+        <h2>{isLogin ? 'Se connecter' : 'Creer un compte'}</h2>
+        <p class="auth-subtitle">
+          {isLogin
+            ? 'Accedez a vos CVs et a votre espace.'
+            : 'Creez votre compte, puis confirmez votre email pour activer votre acces.'}
+        </p>
+      </div>
+
+      <div class="auth-switch" role="tablist" aria-label="Choisir un mode">
+        <button type="button" class:active={isLogin} aria-pressed={isLogin} on:click={() => setAuthMode(true)}>
+          Se connecter
+        </button>
+        <button type="button" class:active={!isLogin} aria-pressed={!isLogin} on:click={() => setAuthMode(false)}>
+          Creer un compte
+        </button>
+      </div>
+
+      {#if authNotice}
+        <div class="auth-alert auth-alert--success" role="status">{authNotice}</div>
+      {/if}
+      {#if authError}
+        <div class="auth-alert auth-alert--error" role="alert">{authError}</div>
+      {/if}
+
       <form on:submit|preventDefault={isLogin ? login : signup}>
         <div class="form-group">
-          <input type="email" placeholder="Email" bind:value={email} required />
+          <label for="auth-email">Email</label>
+          <input
+            id="auth-email"
+            type="email"
+            placeholder="nom@domaine.com"
+            bind:value={email}
+            required
+            autocomplete="email"
+          />
+          {#if !isLogin}
+            <p class="field-hint">Utilisez un email actif pour recevoir le lien de confirmation.</p>
+          {/if}
         </div>
         <div class="form-group">
-          <input type="password" placeholder="Mot de passe" bind:value={password} required />
+          <label for="auth-password">Mot de passe</label>
+          <div class="input-with-action">
+            <input
+              id="auth-password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="6 caracteres minimum"
+              bind:value={password}
+              required
+              autocomplete={isLogin ? 'current-password' : 'new-password'}
+            />
+            <button type="button" class="input-action" on:click={() => (showPassword = !showPassword)}>
+              {showPassword ? 'Masquer' : 'Afficher'}
+            </button>
+          </div>
+          {#if !isLogin}
+            <p class="field-hint">Minimum 6 caracteres.</p>
+          {/if}
         </div>
-        <button type="submit">{isLogin ? 'Se connecter' : "S'inscrire"}</button>
+
+        {#if !isLogin}
+          <div class="form-group">
+            <label for="auth-confirm">Confirmer le mot de passe</label>
+            <div class="input-with-action">
+              <input
+                id="auth-confirm"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Repetez le mot de passe"
+                bind:value={confirmPassword}
+                required
+                autocomplete="new-password"
+              />
+              <button type="button" class="input-action" on:click={() => (showConfirmPassword = !showConfirmPassword)}>
+                {showConfirmPassword ? 'Masquer' : 'Afficher'}
+              </button>
+            </div>
+          </div>
+        {/if}
+
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Chargement...' : isLogin ? 'Se connecter' : 'Creer mon compte'}
+        </button>
       </form>
-      <button type="button" class="toggle-link" on:click={() => isLogin = !isLogin}>
-        {isLogin ? 'Pas encore de compte ? Creer un' : 'Deja inscrit ? Se connecter'}
-      </button>
+
+      {#if pendingEmail}
+        <div class="auth-resend">
+          <span>Pas recu l'email ?</span>
+          <button
+            type="button"
+            class="link-button"
+            on:click={resendConfirmation}
+            disabled={resendCooldown > 0 || isSubmitting}
+          >
+            {resendCooldown > 0 ? `Renvoyer dans ${resendCooldown}s` : "Renvoyer l'email"}
+          </button>
+        </div>
+      {/if}
     </section>
   {/if}
 
@@ -1137,12 +1322,117 @@
     color: var(--brand-ink);
   }
 
-  .toggle-link {
+  .auth-header {
+    display: grid;
+    gap: 8px;
+  }
+
+  .auth-subtitle {
+    margin: 0;
+    color: var(--brand-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .auth-switch {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 6px;
+    border-radius: 999px;
+    background: var(--brand-surface-strong);
+    border: 1px solid var(--brand-border);
+  }
+
+  .auth-switch button {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--brand-ink-muted);
+    font-weight: 600;
+    box-shadow: none;
+  }
+
+  .auth-switch button.active {
+    background: #ffffff;
+    color: var(--brand-ink);
+    border-color: var(--brand-border);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .auth-alert {
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .auth-alert--success {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+  }
+
+  .auth-alert--error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+  }
+
+  .field-hint {
+    margin: 6px 0 0;
+    font-size: 0.82rem;
+    color: var(--brand-muted);
+  }
+
+  .input-with-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .input-with-action input {
+    flex: 1;
+  }
+
+  .input-action {
+    padding: 8px 12px;
+    background: #ffffff;
+    border: 1px solid var(--brand-border);
+    color: var(--brand-ink);
+    border-radius: 10px;
+    font-size: 0.85rem;
+    box-shadow: none;
+  }
+
+  .auth-resend {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--brand-muted);
+  }
+
+  .link-button {
+    padding: 0;
     background: transparent;
     border: none;
     color: var(--brand-accent);
     font-weight: 600;
-    cursor: pointer;
+    box-shadow: none;
+  }
+
+  .link-button:disabled {
+    color: var(--brand-muted);
+    cursor: not-allowed;
+  }
+
+  .auth-switch button:hover,
+  .input-action:hover,
+  .link-button:hover {
+    transform: none;
   }
 
   .top-bar {
