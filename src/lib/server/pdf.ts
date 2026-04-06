@@ -270,8 +270,13 @@ export async function generateCvPdf(cv: CvData): Promise<Buffer> {
     });
 
     await page.setContent(html, { waitUntil: 'networkidle' });
-    await page.emulateMediaType('screen');
-    await page.evaluateHandle('document.fonts.ready');
+    await page.evaluate(() => {
+      document.documentElement.style.background = '#ffffff';
+    });
+    if ('emulateMediaType' in page) {
+      await (page as any).emulateMediaType('screen');
+    }
+    await page.evaluateHandle('document.fonts?.ready');
 
     const pdfBuffer = await page.pdf({
       format: 'A4',
