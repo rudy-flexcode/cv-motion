@@ -11,7 +11,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link
-		href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+		href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
 		rel="stylesheet"
 	/>
 	<link rel="icon" href={logoKreolTech} type="image/png" />
@@ -32,21 +32,21 @@
 <style>
 	:global(:root) {
 		--brand-ink: #0b1220;
-		--brand-ink-soft: #111a2e;
-		--brand-ink-muted: #1f2937;
+		--brand-ink-soft: #162132;
+		--brand-ink-muted: #2c3a4b;
 		--brand-surface: #ffffff;
-		--brand-surface-soft: #f8fafc;
-		--brand-surface-strong: #eef2ff;
-		--brand-border: #e2e8f0;
-		--brand-border-strong: #cbd5f5;
-		--brand-muted: #5b6b80;
-		--brand-accent: #2563eb;
-		--brand-accent-strong: #1d4ed8;
-		--brand-accent-soft: #dbeafe;
-		--brand-gold: #d4af37;
-		--brand-gold-soft: #f1d487;
-		--shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.12);
-		--shadow-strong: 0 28px 80px rgba(15, 23, 42, 0.28);
+		--brand-surface-soft: #fff7f2;
+		--brand-surface-strong: #ffece1;
+		--brand-border: #f0e3d9;
+		--brand-border-strong: #e6cdbd;
+		--brand-muted: #6b778a;
+		--brand-accent: #ff6b35;
+		--brand-accent-strong: #e84c1b;
+		--brand-accent-soft: #ffe1d6;
+		--brand-gold: #f4b93d;
+		--brand-gold-soft: #ffe6a8;
+		--shadow-soft: 0 18px 40px rgba(21, 24, 36, 0.12);
+		--shadow-strong: 0 32px 90px rgba(21, 24, 36, 0.25);
 		--radius-xl: 32px;
 		--radius-lg: 24px;
 		--radius-md: 18px;
@@ -54,12 +54,12 @@
 	}
 
 	:global(body) {
-		font-family: 'Manrope', 'Segoe UI', sans-serif;
+		font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
 		background:
-			radial-gradient(1200px 600px at 15% -10%, rgba(37, 99, 235, 0.18), transparent 60%),
-			radial-gradient(900px 520px at 90% 5%, rgba(14, 165, 233, 0.15), transparent 60%),
-			radial-gradient(700px 420px at 40% 110%, rgba(15, 23, 42, 0.12), transparent 62%),
-			#f6f8ff;
+			radial-gradient(950px 520px at 12% -8%, rgba(255, 107, 53, 0.22), transparent 60%),
+			radial-gradient(860px 520px at 88% 6%, rgba(16, 185, 129, 0.18), transparent 58%),
+			radial-gradient(820px 560px at 50% 120%, rgba(59, 130, 246, 0.12), transparent 65%),
+			#fff7f2;
 		color: var(--brand-ink);
 		margin: 0;
 		padding: 32px 24px 60px;

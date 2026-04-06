@@ -32,6 +32,7 @@
   let regeneratingId: string | null = null;
   let userEmailSuffix = '';
   let cvTitle = 'CV';
+  let showAuthModal = false;
 
   type Experience = {
     poste: string;
@@ -68,6 +69,47 @@
 
   let selectedCompetences: string[] = [];
   let competencesDisponibles: string[] = [];
+
+  const SAMPLE_CV = {
+    nom: 'Durand',
+    prenom: 'Lea',
+    metier: 'Developpeuse web',
+    tel: '06 12 34 56 78',
+    email: 'lea.durand@email.com',
+    adresse: '12 rue des Lilas',
+    ville: 'Paris',
+    linkedin: 'linkedin.com/in/lea-durand',
+    portfolio: 'www.lea-durand.dev',
+    presentation:
+      "Developpeuse web passionnee par les experiences claires et accessibles. J'aime transformer des idees en interfaces rapides et elegantes.",
+    experiences: [
+      {
+        poste: 'Developpeuse front-end',
+        entreprise: 'Studio Octo',
+        debut: '2022',
+        fin: 'Present',
+        description: '- Refonte de tableaux de bord\n- Optimisation des performances web\n- Design system et components'
+      },
+      {
+        poste: 'Integratrice web',
+        entreprise: 'Agence Bloom',
+        debut: '2020',
+        fin: '2022',
+        description: '- Integration responsive\n- Templates emails\n- Maintenance SEO'
+      }
+    ],
+    formations: [
+      {
+        diplome: 'Master Informatique',
+        etablissement: 'Universite Paris-Saclay',
+        debut: '2018',
+        fin: '2020'
+      }
+    ],
+    competences: ['Svelte', 'TypeScript', 'Figma', 'Tailwind'],
+    langues: 'Francais (natif), Anglais (B2)',
+    permis: 'B'
+  };
 
   $: userEmailSuffix = user?.email ? ` : ${user.email}` : '';
   $: cvTitle = (cvForm.prenom || cvForm.nom) ? `${cvForm.prenom} ${cvForm.nom}`.trim() : 'CV';
@@ -176,6 +218,7 @@
     user = data.user;
     pendingEmail = '';
     await getMesCVs();
+    showAuthModal = false;
   }
 
   async function resendConfirmation() {
@@ -239,6 +282,13 @@
   }
 
   function handleSubmit() {
+    if (!user) {
+      authError = '';
+      authNotice = 'Creez un compte pour sauvegarder et telecharger votre CV.';
+      isLogin = false;
+      openAuthModal();
+      return;
+    }
     if (editingId) {
       modifierCV(editingId);
       return;
@@ -273,6 +323,18 @@
     };
     selectedCompetences = [];
     competencesDisponibles = [];
+  }
+
+  function openAuthModal() {
+    showAuthModal = true;
+  }
+
+  function closeAuthModal() {
+    showAuthModal = false;
+  }
+
+  function openExample() {
+    modalCV = { data: SAMPLE_CV };
   }
 
   async function downloadSecureCv(cvId: string, refresh = false) {
@@ -363,199 +425,65 @@
 </svelte:head>
 
 <main class="page">
-  <section class="hero">
-    <div class="hero-orb hero-orb--one"></div>
-    <div class="hero-orb hero-orb--two"></div>
-    <div class="hero-orb hero-orb--three"></div>
-
-    <div class="hero-content">
-      <div class="brand-row">
-        <img class="brand-logo" src={logoKreolTech} alt="Kreol tech" />
-        <span class="brand-name">Kreol tech</span>
-      </div>
-      <span class="hero-eyebrow">CV premium</span>
-      <h1 class="hero-title"><span class="hero-title-accent">CV</span> Motion</h1>
-      <p class="hero-lead">
-        Creez un CV clair et moderne en quelques minutes. Export PDF propre, stockage securise, acces immediat.
-      </p>
-      <div class="hero-actions">
-        <div class="hero-actions-inner">
-          <a class="btn-primary" href={user ? '#builder' : '#auth'}>Creer mon CV</a>
-          <a class="btn-ghost" href="#builder">Voir un exemple</a>
-          <a class="btn-primary is-clone" href={user ? '#builder' : '#auth'} aria-hidden="true">Creer mon CV</a>
-          <a class="btn-ghost is-clone" href="#builder" aria-hidden="true">Voir un exemple</a>
-        </div>
-      </div>
-      <div class="hero-proof">
-        <div class="proof-line">Export PDF pro en 1 clic</div>
-        <div class="proof-line">Stockage prive et securise</div>
-        <div class="proof-secure">Paiement securise par Stripe</div>
+  <header class="mini-header">
+    <div class="mini-brand">
+      <img class="mini-logo" src={logoKreolTech} alt="Kreol tech" />
+      <div class="mini-brand-text">
+        <span class="mini-brand-name">Kreol tech</span>
+        <span class="mini-brand-sub">CV Motion</span>
       </div>
     </div>
-
-    <div class="hero-showcase">
-      <div class="showcase-card showcase-card--primary">
-        <div class="price-row">
-          <span class="price-tag">2,49 EUR</span>
-          <span class="price-sub">Paiement unique</span>
-        </div>
-        <div class="mini-cv">
-          <div class="mini-header">
-            <div class="mini-avatar"></div>
-            <div class="mini-lines">
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <div class="mini-body">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div class="mini-grid">
-            <div class="mini-block"></div>
-            <div class="mini-block"></div>
-            <div class="mini-block"></div>
-          </div>
-        </div>
-        <div class="showcase-tags">
-          <span>PDF HD</span>
-          <span>Design pro</span>
-          <span>Acces instantane</span>
-        </div>
-      </div>
-
-      <div class="showcase-card showcase-card--glass">
-        <p class="glass-title">Pret a postuler</p>
-        <p class="glass-sub">Un CV lisible, un PDF net, un partage rapide.</p>
-        <div class="glass-metrics">
-          <div>
-            <span class="metric-value">Instantane</span>
-            <span class="metric-label">Generation PDF</span>
-          </div>
-          <div>
-            <span class="metric-value">100% prive</span>
-            <span class="metric-label">Stockage securise</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {#if !user}
-    <section class="auth-container" id="auth">
-      <div class="auth-header">
-        <h2>{isLogin ? 'Se connecter' : 'Creer un compte'}</h2>
-        <p class="auth-subtitle">
-          {isLogin
-            ? 'Accedez a vos CVs et a votre espace.'
-            : 'Creez votre compte, puis confirmez votre email pour activer votre acces.'}
-        </p>
-      </div>
-
-      <div class="auth-switch" role="tablist" aria-label="Choisir un mode">
-        <button type="button" class:active={isLogin} aria-pressed={isLogin} on:click={() => setAuthMode(true)}>
+    <div class="mini-actions">
+      {#if user}
+        <span class="user-pill">Connecte{userEmailSuffix}</span>
+        <button class="logout-btn" on:click={logout}>Se deconnecter</button>
+      {:else}
+        <button
+          type="button"
+          class="mini-auth ghost"
+          on:click={() => {
+            setAuthMode(true);
+            openAuthModal();
+          }}
+        >
           Se connecter
         </button>
-        <button type="button" class:active={!isLogin} aria-pressed={!isLogin} on:click={() => setAuthMode(false)}>
+        <button
+          type="button"
+          class="mini-auth"
+          on:click={() => {
+            setAuthMode(false);
+            openAuthModal();
+          }}
+        >
           Creer un compte
         </button>
-      </div>
-
-      {#if authNotice}
-        <div class="auth-alert auth-alert--success" role="status">{authNotice}</div>
       {/if}
-      {#if authError}
-        <div class="auth-alert auth-alert--error" role="alert">{authError}</div>
-      {/if}
-
-      <form on:submit|preventDefault={isLogin ? login : signup}>
-        <div class="form-group">
-          <label for="auth-email">Email</label>
-          <input
-            id="auth-email"
-            type="email"
-            placeholder="nom@domaine.com"
-            bind:value={email}
-            required
-            autocomplete="email"
-          />
-          {#if !isLogin}
-            <p class="field-hint">Utilisez un email actif pour recevoir le lien de confirmation.</p>
-          {/if}
-        </div>
-        <div class="form-group">
-          <label for="auth-password">Mot de passe</label>
-          <div class="input-with-action">
-            <input
-              id="auth-password"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="6 caracteres minimum"
-              bind:value={password}
-              required
-              autocomplete={isLogin ? 'current-password' : 'new-password'}
-            />
-            <button type="button" class="input-action" on:click={() => (showPassword = !showPassword)}>
-              {showPassword ? 'Masquer' : 'Afficher'}
-            </button>
-          </div>
-          {#if !isLogin}
-            <p class="field-hint">Minimum 6 caracteres.</p>
-          {/if}
-        </div>
-
-        {#if !isLogin}
-          <div class="form-group">
-            <label for="auth-confirm">Confirmer le mot de passe</label>
-            <div class="input-with-action">
-              <input
-                id="auth-confirm"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Repetez le mot de passe"
-                bind:value={confirmPassword}
-                required
-                autocomplete="new-password"
-              />
-              <button type="button" class="input-action" on:click={() => (showConfirmPassword = !showConfirmPassword)}>
-                {showConfirmPassword ? 'Masquer' : 'Afficher'}
-              </button>
-            </div>
-          </div>
-        {/if}
-
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Chargement...' : isLogin ? 'Se connecter' : 'Creer mon compte'}
-        </button>
-      </form>
-
-      {#if pendingEmail}
-        <div class="auth-resend">
-          <span>Pas recu l'email ?</span>
-          <button
-            type="button"
-            class="link-button"
-            on:click={resendConfirmation}
-            disabled={resendCooldown > 0 || isSubmitting}
-          >
-            {resendCooldown > 0 ? `Renvoyer dans ${resendCooldown}s` : "Renvoyer l'email"}
-          </button>
-        </div>
-      {/if}
-    </section>
-  {/if}
-
-  {#if user}
-    <div class="top-bar">
-      <span class="user-pill">Connecte{userEmailSuffix}</span>
-      <button class="logout-btn" on:click={logout}>Se deconnecter</button>
     </div>
-  {/if}
+  </header>
 
-  {#if user}
-    <div class="container" id="builder">
+  <div class="container" id="builder">
       <div class="form-section">
         <h2>{editingId ? 'Modifier le CV' : 'Creer un CV'}</h2>
+        {#if !user}
+          <div class="auth-callout">
+            <div class="auth-callout-title">Etape 1 : Remplissez votre CV</div>
+            <div class="auth-callout-text">Etape 2 : Creez un compte pour sauvegarder et telecharger.</div>
+            <a
+              class="auth-callout-link"
+              href="#auth"
+              on:click|preventDefault={() => {
+                setAuthMode(false);
+                openAuthModal();
+              }}
+            >
+              Creer un compte
+            </a>
+          </div>
+        {/if}
+        <div class="builder-actions">
+          <a class="btn-ghost" href="#example" on:click|preventDefault={openExample}>Voir un exemple</a>
+        </div>
         <form on:submit|preventDefault={handleSubmit}>
           <div class="form-row">
             <div class="form-group">
@@ -878,8 +806,7 @@
           </div>
         </div>
       </div>
-    </div>
-  {/if}
+  </div>
 
   {#if user}
     <div class="cv-list">
@@ -941,6 +868,115 @@
   {#if showPaymentModal && cvToPay}
     <PaymentModal cv={cvToPay} on:close={() => { showPaymentModal = false; cvToPay = null; }} />
   {/if}
+
+  {#if !user && showAuthModal}
+    <div class="auth-modal" role="dialog" aria-modal="true" on:click={closeAuthModal}>
+      <div class="auth-modal-card" on:click|stopPropagation>
+        <button class="auth-modal-close" on:click={closeAuthModal} aria-label="Fermer">
+          &times;
+        </button>
+        <section class="auth-container">
+          <div class="auth-header">
+            <h2>{isLogin ? 'Se connecter' : 'Creer un compte'}</h2>
+            <p class="auth-subtitle">
+              {isLogin
+                ? 'Accedez a vos CVs et a votre espace.'
+                : 'Creez votre compte, puis confirmez votre email pour activer votre acces.'}
+            </p>
+          </div>
+
+          <div class="auth-switch" role="tablist" aria-label="Choisir un mode">
+            <button type="button" class:active={isLogin} aria-pressed={isLogin} on:click={() => setAuthMode(true)}>
+              Se connecter
+            </button>
+            <button type="button" class:active={!isLogin} aria-pressed={!isLogin} on:click={() => setAuthMode(false)}>
+              Creer un compte
+            </button>
+          </div>
+
+          {#if authNotice}
+            <div class="auth-alert auth-alert--success" role="status">{authNotice}</div>
+          {/if}
+          {#if authError}
+            <div class="auth-alert auth-alert--error" role="alert">{authError}</div>
+          {/if}
+
+          <form on:submit|preventDefault={isLogin ? login : signup}>
+            <div class="form-group">
+              <label for="auth-email">Email</label>
+              <input
+                id="auth-email"
+                type="email"
+                placeholder="nom@domaine.com"
+                bind:value={email}
+                required
+                autocomplete="email"
+              />
+              {#if !isLogin}
+                <p class="field-hint">Utilisez un email actif pour recevoir le lien de confirmation.</p>
+              {/if}
+            </div>
+            <div class="form-group">
+              <label for="auth-password">Mot de passe</label>
+              <div class="input-with-action">
+                <input
+                  id="auth-password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="6 caracteres minimum"
+                  bind:value={password}
+                  required
+                  autocomplete={isLogin ? 'current-password' : 'new-password'}
+                />
+                <button type="button" class="input-action" on:click={() => (showPassword = !showPassword)}>
+                  {showPassword ? 'Masquer' : 'Afficher'}
+                </button>
+              </div>
+              {#if !isLogin}
+                <p class="field-hint">Minimum 6 caracteres.</p>
+              {/if}
+            </div>
+
+            {#if !isLogin}
+              <div class="form-group">
+                <label for="auth-confirm">Confirmer le mot de passe</label>
+                <div class="input-with-action">
+                  <input
+                    id="auth-confirm"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Repetez le mot de passe"
+                    bind:value={confirmPassword}
+                    required
+                    autocomplete="new-password"
+                  />
+                  <button type="button" class="input-action" on:click={() => (showConfirmPassword = !showConfirmPassword)}>
+                    {showConfirmPassword ? 'Masquer' : 'Afficher'}
+                  </button>
+                </div>
+              </div>
+            {/if}
+
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Chargement...' : isLogin ? 'Se connecter' : 'Creer mon compte'}
+            </button>
+          </form>
+
+          {#if pendingEmail}
+            <div class="auth-resend">
+              <span>Pas recu l'email ?</span>
+              <button
+                type="button"
+                class="link-button"
+                on:click={resendConfirmation}
+                disabled={resendCooldown > 0 || isSubmitting}
+              >
+                {resendCooldown > 0 ? `Renvoyer dans ${resendCooldown}s` : "Renvoyer l'email"}
+              </button>
+            </div>
+          {/if}
+        </section>
+      </div>
+    </div>
+  {/if}
 </main>
 
 <style>
@@ -953,126 +989,81 @@
     flex-direction: column;
     gap: 40px;
   }
-
-  .hero {
-    position: relative;
-    overflow: hidden;
-    border-radius: var(--radius-xl);
-    padding: 44px;
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-    gap: 32px;
+  .mini-header {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #0b1220 0%, #111a2e 55%, #132b52 100%);
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    box-shadow: var(--shadow-strong);
-    color: #e2e8f0;
-  }
-
-  .hero-orb {
-    position: absolute;
-    border-radius: 999px;
-    filter: blur(18px);
-    opacity: 0.6;
-  }
-
-  .hero-orb--one {
-    width: 220px;
-    height: 220px;
-    background: radial-gradient(circle, rgba(37, 99, 235, 0.85), transparent 70%);
-    top: -80px;
-    left: -40px;
-  }
-
-  .hero-orb--two {
-    width: 320px;
-    height: 320px;
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.6), transparent 70%);
-    bottom: -140px;
-    right: 10%;
-  }
-
-  .hero-orb--three {
-    width: 180px;
-    height: 180px;
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.6), transparent 70%);
-    top: 40px;
-    right: -40px;
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 1;
-    display: grid;
     gap: 18px;
-    animation: fadeUp 0.9s ease both;
+    padding: 14px 18px;
+    border-radius: calc(var(--radius-lg) + 4px);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 236, 225, 0.75)),
+      #ffffff;
+    border: 1px solid rgba(255, 153, 109, 0.35);
+    box-shadow: 0 20px 50px rgba(21, 24, 36, 0.12);
+    backdrop-filter: blur(8px);
   }
 
-  .brand-row {
+  .mini-brand {
     display: flex;
     align-items: center;
     gap: 12px;
   }
 
-  .brand-logo {
-    width: 46px;
-    height: 46px;
+  .mini-logo {
+    width: 44px;
+    height: 44px;
     object-fit: contain;
     border-radius: 14px;
-    background: rgba(15, 23, 42, 0.5);
-    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.18), rgba(14, 165, 233, 0.12));
+    border: 1px solid rgba(255, 153, 109, 0.4);
     padding: 6px;
   }
 
-  .brand-name {
+  .mini-brand-text {
+    display: grid;
+    gap: 2px;
+  }
+
+  .mini-brand-name {
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    font-size: 0.88rem;
-    color: rgba(226, 232, 240, 0.9);
-  }
-
-  .hero-eyebrow {
     font-size: 0.72rem;
-    letter-spacing: 0.38em;
-    text-transform: uppercase;
-    color: rgba(191, 219, 254, 0.85);
+    color: rgba(90, 103, 122, 0.9);
   }
 
-  .hero-title {
-    margin: 0;
-    font-size: 3.7rem;
-    color: #f8fafc;
-    font-family: "Fraunces", "Times New Roman", serif;
+  .mini-brand-sub {
+    font-weight: 700;
+    font-size: 1.12rem;
+    color: var(--brand-ink);
   }
 
-  .hero-title-accent {
-    color: #93c5fd;
-  }
-
-  .hero-lead {
-    margin: 0;
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: #c7d2fe;
-    max-width: 520px;
-  }
-
-  .hero-actions {
+  .mini-actions {
     display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .hero-actions-inner {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
     align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
-  .hero-actions-inner .is-clone {
-    display: none;
+  .mini-auth {
+    background: linear-gradient(135deg, #ff6b35, #ff4f2c);
+    color: #ffffff;
+    border: 1px solid rgba(255, 79, 44, 0.5);
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.92rem;
+    box-shadow: 0 14px 30px rgba(255, 107, 53, 0.35);
+  }
+
+  .mini-auth.ghost {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--brand-ink);
+    border: 1px solid rgba(255, 153, 109, 0.35);
+    box-shadow: none;
   }
 
   .btn-primary,
@@ -1080,7 +1071,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 22px;
+    padding: 10px 18px;
     border-radius: 999px;
     font-weight: 600;
     text-decoration: none;
@@ -1088,219 +1079,67 @@
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: #f8fafc;
-    border: 1px solid rgba(147, 197, 253, 0.35);
-    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.35);
+    background: linear-gradient(135deg, #ff6b35, #ff4f2c);
+    color: #fffaf7;
+    border: 1px solid rgba(255, 107, 53, 0.4);
+    box-shadow: 0 12px 26px rgba(255, 107, 53, 0.3);
   }
 
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 18px 40px rgba(37, 99, 235, 0.45);
+    transform: translateY(-1px);
+    box-shadow: 0 18px 40px rgba(37, 99, 235, 0.3);
   }
 
   .btn-ghost {
-    border: 1px solid rgba(148, 163, 184, 0.35);
-    color: #e2e8f0;
-    background: rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(255, 153, 109, 0.35);
+    color: var(--brand-ink);
+    background: rgba(255, 255, 255, 0.95);
   }
 
   .btn-ghost:hover {
     transform: translateY(-1px);
   }
 
-  .hero-proof {
-    display: grid;
-    gap: 10px;
-    font-size: 0.92rem;
-    color: #e0e7ff;
-  }
-
-  .proof-line {
-    font-weight: 600;
-  }
-
-  .proof-secure {
-    color: rgba(191, 219, 254, 0.9);
-  }
-
-  .hero-showcase {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    gap: 18px;
-    animation: fadeUp 0.9s ease both;
-    animation-delay: 0.1s;
-  }
-
-  .showcase-card {
-    border-radius: 22px;
-    padding: 18px;
-    border: 1px solid rgba(148, 163, 184, 0.25);
-  }
-
-  .showcase-card--primary {
-    background: linear-gradient(150deg, rgba(15, 23, 42, 0.9), rgba(30, 64, 175, 0.92));
-    box-shadow: 0 20px 42px rgba(15, 23, 42, 0.45);
-  }
-
-  .showcase-card--glass {
-    background: rgba(15, 23, 42, 0.55);
-    backdrop-filter: blur(10px);
-  }
-
-  .price-row {
+  .auth-modal {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(800px 420px at 20% 10%, rgba(255, 107, 53, 0.28), transparent 60%),
+      radial-gradient(800px 420px at 80% 20%, rgba(14, 165, 233, 0.22), transparent 60%),
+      rgba(15, 23, 42, 0.5);
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-
-  .price-tag {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #f8fafc;
-  }
-
-  .price-sub {
-    font-size: 0.82rem;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: rgba(191, 219, 254, 0.75);
-  }
-
-  .mini-cv {
-    background: rgba(15, 23, 42, 0.7);
-    border-radius: 16px;
-    padding: 14px;
-    display: grid;
-    gap: 12px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-  }
-
-  .mini-header {
-    display: flex;
-    gap: 10px;
     align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 1200;
+    backdrop-filter: blur(8px);
   }
 
-  .mini-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #93c5fd, #1d4ed8);
+  .auth-modal-card {
+    position: relative;
+    width: min(520px, 100%);
   }
 
-  .mini-lines {
-    display: grid;
-    gap: 6px;
-    flex: 1;
+  .auth-modal-card .auth-container {
+    margin: 0;
+    max-width: none;
   }
 
-  .mini-lines span {
-    display: block;
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(191, 219, 254, 0.55);
-  }
-
-  .mini-lines span:last-child {
-    width: 70%;
-    background: rgba(191, 219, 254, 0.35);
-  }
-
-  .mini-body {
-    display: grid;
-    gap: 6px;
-  }
-
-  .mini-body span {
-    display: block;
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(148, 163, 184, 0.35);
-  }
-
-  .mini-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-  }
-
-  .mini-block {
-    height: 20px;
-    border-radius: 10px;
-    background: rgba(59, 130, 246, 0.35);
-  }
-
-  .showcase-tags {
-    margin-top: 12px;
+  .auth-modal-close {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background: #ffffff;
+    border: 1px solid var(--brand-border);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: #dbeafe;
-  }
-
-  .showcase-tags span {
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(148, 163, 184, 0.3);
-  }
-
-  .glass-title {
-    margin: 0 0 6px;
-    font-size: 1.05rem;
-    color: #f8fafc;
-    font-weight: 700;
-  }
-
-  .glass-sub {
-    margin: 0 0 14px;
-    color: #c7d2fe;
-    font-size: 0.9rem;
-  }
-
-  .glass-metrics {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-
-  .metric-value {
-    display: block;
-    font-weight: 700;
-    color: #93c5fd;
-  }
-
-  .metric-label {
-    display: block;
-    font-size: 0.78rem;
-    color: #c7d2fe;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-  }
-
-  @keyframes fadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(18px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes hero-marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-soft);
   }
 
   .auth-container {
@@ -1435,13 +1274,6 @@
     transform: none;
   }
 
-  .top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-  }
-
   .user-pill {
     font-size: 0.9rem;
     color: var(--brand-muted);
@@ -1468,11 +1300,23 @@
   }
 
   .form-section {
-    background: rgba(255, 255, 255, 0.96);
-    padding: 30px;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--brand-border);
-    box-shadow: var(--shadow-soft);
+    background: rgba(255, 255, 255, 0.98);
+    padding: 32px;
+    border-radius: calc(var(--radius-lg) + 2px);
+    border: 1px solid rgba(255, 153, 109, 0.25);
+    box-shadow: 0 28px 70px rgba(21, 24, 36, 0.12);
+    position: relative;
+  }
+
+  .form-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ff6b35, #0ea5e9);
   }
 
   .form-section h2 {
@@ -1481,6 +1325,50 @@
     color: var(--brand-ink);
     border-bottom: 2px solid var(--brand-border);
     padding-bottom: 10px;
+  }
+
+  .auth-callout {
+    margin: 12px 0 16px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.12), rgba(14, 165, 233, 0.08));
+    border: 1px solid rgba(255, 153, 109, 0.35);
+    display: grid;
+    gap: 6px;
+  }
+
+  .auth-callout-title {
+    font-weight: 700;
+    color: var(--brand-ink);
+  }
+
+  .auth-callout-text {
+    font-size: 0.92rem;
+    color: var(--brand-muted);
+  }
+
+  .auth-callout-link {
+    color: var(--brand-accent);
+    font-weight: 600;
+    text-decoration: none;
+    width: fit-content;
+  }
+
+  .auth-callout-link:hover {
+    text-decoration: underline;
+  }
+
+  .builder-actions {
+    margin: 10px 0 18px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .builder-actions .btn-ghost {
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--brand-ink);
+    border-color: var(--brand-border);
   }
 
   .form-group {
@@ -1639,11 +1527,11 @@
   .preview {
     flex: 0 0 auto;
     width: calc(210mm + 16px);
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.96);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--brand-border);
-    box-shadow: var(--shadow-soft);
+    padding: 10px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 241, 235, 0.85));
+    border-radius: calc(var(--radius-md) + 4px);
+    border: 1px solid rgba(255, 153, 109, 0.25);
+    box-shadow: 0 26px 70px rgba(21, 24, 36, 0.14);
     overflow: auto;
     max-height: 90vh;
   }
@@ -1661,11 +1549,11 @@
   .cv-list {
     display: grid;
     gap: 14px;
-    background: rgba(255, 255, 255, 0.96);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--brand-border);
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: calc(var(--radius-lg) + 2px);
+    border: 1px solid rgba(255, 153, 109, 0.25);
     padding: 24px;
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 22px 60px rgba(21, 24, 36, 0.12);
   }
 
   .cv-list h2 {
@@ -1766,46 +1654,15 @@
     }
   }
 
-  @media (max-width: 980px) {
-    .hero {
-      grid-template-columns: 1fr;
-    }
-
-    .hero-showcase {
-      grid-template-columns: 1fr;
-    }
-  }
-
   @media (max-width: 720px) {
-    .hero {
-      padding: 24px;
+    .mini-header {
+      flex-direction: column;
+      align-items: flex-start;
     }
 
-    .hero-title {
-      font-size: 2.6rem;
-    }
-
-    .hero-actions {
-      overflow: hidden;
-      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
-      mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
-    }
-
-    .hero-actions-inner {
-      flex-wrap: nowrap;
-      width: max-content;
-      animation: hero-marquee 12s linear infinite;
-    }
-
-    .hero-actions-inner .is-clone {
-      display: inline-flex;
-    }
-
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero-actions-inner {
-      animation: none;
+    .mini-actions {
+      width: 100%;
+      justify-content: flex-start;
     }
   }
 </style>

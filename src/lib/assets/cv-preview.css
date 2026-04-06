@@ -8,30 +8,33 @@
   --pdf-divider-offset: 4.2mm;
   --pdf-sidebar-top-gap: 4mm;
   --pdf-divider-top: 6.2mm;
-  --cv-ink: #0f172a;
-  --cv-muted: #6b6458;
-  --cv-border: #e5e2dc;
-  --cv-gold: #c89b3c;
-  --cv-gold-soft: #f2e8d0;
-  --cv-gold-border: #e2d3ae;
-  --cv-sidebar-bg: #f7f5f1;
+  --cv-ink: #0b1220;
+  --cv-muted: #5a6b82;
+  --cv-border: #e7ded4;
+  --cv-gold: #ff6b35;
+  --cv-gold-soft: #fff1e8;
+  --cv-gold-border: #ffd5c6;
+  --cv-accent-2: #0ea5e9;
+  --cv-sidebar-bg: #fff8f3;
   background: #ffffff;
   width: 210mm;
   min-height: 297mm;
   position: relative;
   margin: 0 auto;
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
   font-size: 11.2pt;
   line-height: 1.48;
-  color: #1f2937;
+  color: #111827;
 }
 
 .cv-preview::before {
   content: '';
   position: absolute;
   inset: 0;
-  width: 6.3mm;
-  background: var(--cv-ink);
+  width: 5mm;
+  background: linear-gradient(180deg, var(--cv-gold), var(--cv-accent-2));
+  z-index: 0;
+  pointer-events: none;
 }
 
 .cv-preview * {
@@ -40,10 +43,14 @@
 
 .cv-header {
   height: var(--pdf-header-height);
-  background: linear-gradient(180deg, #ffffff 0%, #f7f5f1 100%);
+  background:
+    radial-gradient(420px 160px at 15% 20%, rgba(255, 107, 53, 0.12), transparent 70%),
+    radial-gradient(420px 160px at 85% 10%, rgba(14, 165, 233, 0.12), transparent 70%),
+    linear-gradient(120deg, #fffaf7 0%, #ffffff 60%, #f4f9ff 100%);
   color: var(--cv-ink);
   position: relative;
   border-bottom: 1px solid var(--cv-border);
+  z-index: 1;
 }
 
 .cv-header::after {
@@ -52,43 +59,49 @@
   left: var(--pdf-margin);
   right: var(--pdf-margin);
   bottom: -1px;
-  height: 2px;
-  background: var(--cv-gold);
+  height: 3px;
+  background: linear-gradient(90deg, var(--cv-gold), var(--cv-accent-2));
+  border-radius: 999px;
 }
 
 .cv-header h2 {
   position: absolute;
-  left: 50%;
-  top: 11mm;
+  left: var(--pdf-margin);
+  top: 12mm;
   margin: 0;
-  font-size: 23pt;
+  font-size: 28pt;
   font-weight: 700;
-  font-family: 'Helvetica', 'Arial', sans-serif;
-  color: #ffffff;
+  font-family: 'Fraunces', 'Times New Roman', serif;
+  color: var(--cv-ink);
   line-height: 1;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  transform: translateX(-50%);
-  padding: 7pt 18pt 6pt;
-  border: 1px solid var(--cv-ink);
-  border-radius: 8pt;
-  background: var(--cv-ink);
-  box-shadow: 0 6pt 12pt rgba(15, 23, 42, 0.12);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  transform: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   max-width: calc(100% - (2 * var(--pdf-margin)));
-  text-align: center;
+  text-align: left;
 }
 
 .cv-metier {
   position: absolute;
-  left: 50%;
+  left: var(--pdf-margin);
   top: 29mm;
-  font-size: 11.2pt;
+  font-size: 11pt;
   color: var(--cv-gold);
-  font-weight: 600;
-  letter-spacing: 0.22em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-family: 'Helvetica', 'Arial', sans-serif;
-  transform: translateX(-50%);
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+  transform: none;
+  background: var(--cv-gold-soft);
+  border: 1px solid var(--cv-gold-border);
+  padding: 2.5pt 10pt;
+  border-radius: 999pt;
+  width: fit-content;
 }
 
 .cv-body {
@@ -102,9 +115,9 @@
   left: var(--pdf-margin);
   width: var(--pdf-sidebar-width);
   bottom: var(--pdf-margin);
-  background: var(--cv-sidebar-bg);
+  background: linear-gradient(180deg, #fff1e8 0%, #fffaf7 70%, #ffffff 100%);
   border: 1px solid var(--cv-border);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75);
 }
 
 .cv-divider {
@@ -113,7 +126,7 @@
   bottom: var(--pdf-margin);
   left: calc(var(--pdf-margin) + var(--pdf-sidebar-width) + var(--pdf-divider-offset));
   width: 1px;
-  background: var(--cv-border);
+  background: rgba(15, 23, 42, 0.08);
 }
 
 .cv-layout {
@@ -140,12 +153,12 @@
 .cv-section h3 {
   margin: 0 0 8pt;
   font-size: 10.8pt;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--cv-ink);
   padding-bottom: 3pt;
   border-bottom: 1px solid var(--cv-border);
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
   font-weight: 700;
   position: relative;
 }
@@ -173,7 +186,7 @@
 
 .cv-contact-item {
   display: grid;
-  grid-template-columns: 6pt 62pt 1fr;
+  grid-template-columns: 6pt 58pt 1fr;
   gap: 6pt;
   align-items: start;
   font-size: 9.6pt;
@@ -194,9 +207,9 @@
   font-weight: 700;
   color: var(--cv-ink);
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.1em;
   font-size: 8.4pt;
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
 }
 
 .cv-label::after {
@@ -220,12 +233,12 @@
   height: 17pt;
   padding: 3pt 7pt;
   border-radius: 8pt;
-  background: var(--cv-gold-soft);
-  color: #7a5b1b;
+  background: #ffffff;
+  color: #9a3b16;
   font-size: 8.6pt;
   font-weight: 700;
   border: 1px solid var(--cv-gold-border);
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
 }
 
 .cv-presentation {
@@ -249,7 +262,7 @@
 
 .cv-exp-header {
   display: grid;
-  grid-template-columns: 1fr 90pt;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8pt;
   align-items: start;
 }
@@ -258,7 +271,7 @@
   font-weight: 700;
   color: var(--cv-ink);
   font-size: 11pt;
-  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
 }
 
 .cv-exp-dates {
@@ -290,7 +303,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  color: currentColor;
+  color: var(--cv-gold);
 }
 
 .cv-exp-subline {
