@@ -244,7 +244,7 @@ export async function generateCvPdf(cv: CvData): Promise<Buffer> {
   const browser = await playwrightChromium.launch({
     args: chromium.args,
     executablePath,
-    headless: chromium.headless
+    headless: true
   });
 
   try {
