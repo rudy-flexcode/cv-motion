@@ -1,4 +1,3 @@
-import chromium from '@sparticuz/chromium';
 import { chromium as playwrightChromium } from 'playwright-core';
 import cvPreviewCss from '$lib/assets/cv-preview.css?inline';
 
@@ -236,8 +235,15 @@ function renderCvHtml(cv: CvData) {
 export async function generateCvPdf(cv: CvData): Promise<Buffer> {
   const html = renderCvHtml(cv);
   if (!process.env.AWS_EXECUTION_ENV && !process.env.AWS_LAMBDA_JS_RUNTIME) {
-    process.env.AWS_EXECUTION_ENV = 'AWS_Lambda_nodejs20.x';
+    process.env.AWS_LAMBDA_JS_RUNTIME = 'nodejs20.x';
   }
+  process.env.FONTCONFIG_PATH ??= '/tmp/fonts';
+  const lambdaLibPath = '/tmp/al2023/lib';
+  if (!process.env.LD_LIBRARY_PATH?.startsWith(lambdaLibPath)) {
+    process.env.LD_LIBRARY_PATH = [lambdaLibPath, process.env.LD_LIBRARY_PATH].filter(Boolean).join(':');
+  }
+
+  const { default: chromium } = await import('@sparticuz/chromium');
   chromium.setHeadlessMode = true;
   const executablePath = (await chromium.executablePath()) || process.env.CHROME_EXECUTABLE_PATH;
 
