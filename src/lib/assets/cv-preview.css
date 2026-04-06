@@ -1,16 +1,16 @@
 .cv-preview {
   --pdf-margin: 19.8mm;
-  --pdf-header-height: 45mm;
+  --pdf-header-height: 40mm;
   --pdf-header-band: 5.64mm;
   --pdf-content-gap: 8.5mm;
-  --pdf-sidebar-width: 63.5mm;
+  --pdf-sidebar-width: 58mm;
   --pdf-column-gap: 8.5mm;
   --pdf-divider-offset: 4.2mm;
   --pdf-sidebar-top-gap: 4mm;
   --pdf-divider-top: 6.2mm;
   --cv-ink: #0b1220;
   --cv-muted: #5a6b82;
-  --cv-border: #e7ded4;
+  --cv-border: #eadfd4;
   --cv-gold: #ff6b35;
   --cv-gold-soft: #fff1e8;
   --cv-gold-border: #ffd5c6;
@@ -31,7 +31,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  width: 5mm;
+  width: 3.8mm;
   background: linear-gradient(180deg, var(--cv-gold), var(--cv-accent-2));
   z-index: 0;
   pointer-events: none;
@@ -67,7 +67,7 @@
 .cv-header h2 {
   position: absolute;
   left: var(--pdf-margin);
-  top: 12mm;
+  top: 17mm;
   margin: 0;
   font-size: 28pt;
   font-weight: 700;
@@ -89,8 +89,8 @@
 .cv-metier {
   position: absolute;
   left: var(--pdf-margin);
-  top: 29mm;
-  font-size: 11pt;
+  top: 31mm;
+  font-size: 10.6pt;
   color: var(--cv-gold);
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -152,7 +152,7 @@
 
 .cv-section h3 {
   margin: 0 0 8pt;
-  font-size: 10.8pt;
+  font-size: 11.6pt;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--cv-ink);
@@ -279,6 +279,7 @@
   color: var(--cv-muted);
   white-space: nowrap;
   text-align: right;
+  padding-left: 4pt;
 }
 
 .cv-exp-description {
