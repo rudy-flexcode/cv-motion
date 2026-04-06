@@ -239,9 +239,11 @@ export async function generateCvPdf(cv: CvData): Promise<Buffer> {
   }
   process.env.FONTCONFIG_PATH ??= '/tmp/fonts';
   const lambdaLibPath = '/tmp/al2023/lib';
-  if (!process.env.LD_LIBRARY_PATH?.startsWith(lambdaLibPath)) {
-    process.env.LD_LIBRARY_PATH = [lambdaLibPath, process.env.LD_LIBRARY_PATH].filter(Boolean).join(':');
-  }
+  const lambdaLibPathFallback = '/tmp/al2/lib';
+  const libPaths = [lambdaLibPath, lambdaLibPathFallback, process.env.LD_LIBRARY_PATH]
+    .filter(Boolean)
+    .join(':');
+  process.env.LD_LIBRARY_PATH = libPaths;
 
   const { default: chromium } = await import('@sparticuz/chromium');
   chromium.setHeadlessMode = true;
@@ -254,7 +256,12 @@ export async function generateCvPdf(cv: CvData): Promise<Buffer> {
   const browser = await playwrightChromium.launch({
     args: chromium.args,
     executablePath,
-    headless: true
+    headless: true,
+    env: {
+      ...process.env,
+      LD_LIBRARY_PATH: process.env.LD_LIBRARY_PATH,
+      FONTCONFIG_PATH: process.env.FONTCONFIG_PATH
+    }
   });
 
   try {
