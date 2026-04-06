@@ -235,6 +235,10 @@ function renderCvHtml(cv: CvData) {
 
 export async function generateCvPdf(cv: CvData): Promise<Buffer> {
   const html = renderCvHtml(cv);
+  if (!process.env.AWS_EXECUTION_ENV && !process.env.AWS_LAMBDA_JS_RUNTIME) {
+    process.env.AWS_EXECUTION_ENV = 'AWS_Lambda_nodejs20.x';
+  }
+  chromium.setHeadlessMode = true;
   const executablePath = (await chromium.executablePath()) || process.env.CHROME_EXECUTABLE_PATH;
 
   if (!executablePath) {
