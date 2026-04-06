@@ -186,7 +186,7 @@
 
 .cv-contact-item {
   display: grid;
-  grid-template-columns: 6pt 58pt 1fr;
+  grid-template-columns: 6pt 54pt 1fr;
   gap: 6pt;
   align-items: start;
   font-size: 9.6pt;
@@ -243,8 +243,8 @@
 
 .cv-presentation {
   color: var(--cv-ink);
-  line-height: 1.5;
-  font-size: 11.2pt;
+  line-height: 1.55;
+  font-size: 11.6pt;
   white-space: pre-line;
 }
 
@@ -279,7 +279,7 @@
   color: var(--cv-muted);
   white-space: nowrap;
   text-align: right;
-  padding-left: 4pt;
+  padding-left: 6pt;
 }
 
 .cv-exp-description {
