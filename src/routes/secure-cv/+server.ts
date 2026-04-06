@@ -4,6 +4,7 @@ import { supabaseAdmin } from '$lib/server/supabaseAdmin';
 import { generateCvPdf, type CvData } from '$lib/server/pdf';
 
 const CV_BUCKET = 'cv-pdfs';
+export const config = { runtime: 'nodejs20.x' };
 
 export const GET: RequestHandler = async ({ url, request }) => {
   const cvId = url.searchParams.get('cvId');
@@ -57,7 +58,13 @@ export const GET: RequestHandler = async ({ url, request }) => {
   if (cvError) throw error(500, 'Erreur CV');
   if (!cvRow) throw error(404, 'CV introuvable');
 
-  const pdfBuffer = await generateCvPdf(cvRow.data as CvData);
+  let pdfBuffer: Buffer;
+  try {
+    pdfBuffer = await generateCvPdf(cvRow.data as CvData);
+  } catch (err) {
+    console.error('Erreur generation PDF:', err);
+    throw error(500, 'Erreur generation PDF');
+  }
   const { error: uploadError } = await supabaseAdmin.storage
     .from(CV_BUCKET)
     .upload(filePath, pdfBuffer, {
